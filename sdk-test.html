@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification SDK Test Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+        }
+
+        .section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .button.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .button.danger {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+        }
+
+        .button.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: #212529;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .log-container {
+            background: #2d3748;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #e2e8f0;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .log-entry.info {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+        }
+
+        .log-entry.success {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 3px solid #22c55e;
+        }
+
+        .log-entry.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid #f59e0b;
+        }
+
+        .log-entry.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid #ef4444;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .notifications-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+        }
+
+        .notification-item {
+            padding: 10px;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 10px;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .notification-message {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid #c3e6cb;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔔 Notification SDK Test Interface</h1>
+            <p>Test all SDK features, monitor logs, and debug issues in real-time</p>
+        </div>
+
+        <div class="content">
+            <!-- Configuration Section -->
+            <div class="section">
+                <h2>⚙️ SDK Configuration</h2>
+                
+                <div class="input-group">
+                    <label for="baseUrl">Base URL:</label>
+                    <input type="text" id="baseUrl" value="https://api.notifications.com" placeholder="Enter your API base URL">
+                </div>
+                
+                <div class="input-group">
+                    <label for="authToken">Auth Token:</label>
+                    <input type="text" id="authToken" value="test-token-123" placeholder="Enter your auth token">
+                </div>
+                
+                <div class="input-group">
+                    <label for="deviceId">Device ID:</label>
+                    <input type="text" id="deviceId" value="test-device-456" placeholder="Enter device ID">
+                </div>
+                
+                <div class="input-group">
+                    <label for="platform">Platform:</label>
+                    <select id="platform">
+                        <option value="iOS">iOS</option>
+                        <option value="Android">Android</option>
+                        <option value="Web" selected>Web</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="osVersion">OS Version:</label>
+                    <input type="text" id="osVersion" value="17.2" placeholder="OS version">
+                </div>
+                
+                <div class="input-group">
+                    <label for="appVersion">App Version:</label>
+                    <input type="text" id="appVersion" value="1.0.0" placeholder="App version">
+                </div>
+                
+                <button class="button" onclick="initializeSDK()">🚀 Initialize SDK</button>
+                <button class="button danger" onclick="resetSDK()">🔄 Reset SDK</button>
+                
+                <div id="initStatus" class="status disconnected">SDK not initialized</div>
+            </div>
+
+            <!-- Device Management Section -->
+            <div class="section">
+                <h2>📱 Device Management</h2>
+                
+                <button class="button" onclick="registerDevice()" id="registerBtn" disabled>📝 Register Device</button>
+                <button class="button" onclick="getDeviceInfo()" id="deviceInfoBtn" disabled>ℹ️ Get Device Info</button>
+                
+                <div id="registerStatus"></div>
+                
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="deviceStatus">❌</div>
+                        <div class="metric-label">Device Status</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="lastSeen">-</div>
+                        <div class="metric-label">Last Seen</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Section -->
+            <div class="section">
+                <h2>🔔 Notifications</h2>
+                
+                <div class="controls">
+                    <button class="button" onclick="syncNotifications()" id="syncBtn" disabled>🔄 Sync Notifications</button>
+                    <button class="button warning" onclick="dismissNotification()" id="dismissBtn" disabled>❌ Dismiss Notification</button>
+                    <button class="button" onclick="clearNotifications()" id="clearBtn" disabled>🗑️ Clear List</button>
+                </div>
+                
+                <div id="notificationsList" class="notifications-list">
+                    <p style="text-align: center; color: #6c757d;">No notifications loaded</p>
+                </div>
+                
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="notificationCount">0</div>
+                        <div class="metric-label">Total Notifications</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="activeNotifications">0</div>
+                        <div class="metric-label">Active Notifications</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Connection Section -->
+            <div class="section">
+                <h2>📡 Real-time Connection</h2>
+                
+                <div class="controls">
+                    <button class="button success" onclick="connectWebSocket()" id="wsConnectBtn" disabled>🔗 Connect WebSocket</button>
+                    <button class="button danger" onclick="disconnectWebSocket()" id="wsDisconnectBtn" disabled>🔌 Disconnect WebSocket</button>
+                </div>
+                
+                <div id="wsStatus" class="status disconnected">WebSocket disconnected</div>
+                
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="wsStatus">❌</div>
+                        <div class="metric-label">WebSocket Status</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="reconnectAttempts">0</div>
+                        <div class="metric-label">Reconnect Attempts</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Tracking Section -->
+            <div class="section">
+                <h2>📊 Event Tracking</h2>
+                
+                <div class="controls">
+                    <button class="button" onclick="trackEvent()" id="trackBtn" disabled>📈 Track Event</button>
+                    <button class="button" onclick="trackBatch()" id="batchBtn" disabled>📦 Track Batch</button>
+                    <button class="button warning" onclick="flushEvents()" id="flushBtn" disabled>🚀 Flush Events</button>
+                    <button class="button danger" onclick="clearEvents()" id="clearEventsBtn" disabled>🗑️ Clear Events</button>
+                </div>
+                
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="queueSize">0</div>
+                        <div class="metric-label">Queue Size</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="totalEvents">0</div>
+                        <div class="metric-label">Total Events</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="batchCount">0</div>
+                        <div class="metric-label">Batch Count</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SDK Status Section -->
+            <div class="section">
+                <h2>📋 SDK Status</h2>
+                
+                <div class="controls">
+                    <button class="button" onclick="checkStatus()" id="statusBtn" disabled>🔍 Check Status</button>
+                    <button class="button warning" onclick="clearLogs()">🗑️ Clear Logs</button>
+                </div>
+                
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="sdkStatus">❌</div>
+                        <div class="metric-label">SDK Status</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="errorCount">0</div>
+                        <div class="metric-label">Error Count</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="successCount">0</div>
+                        <div class="metric-label">Success Count</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs Section -->
+        <div style="padding: 30px;">
+            <h2>📝 Real-time Logs</h2>
+            <div id="logs" class="log-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // SDK Mock Implementation
+        class NotificationSDK {
+            constructor() {
+                this._isInitialized = false;
+                this.isConnected = false;
+                this.eventQueue = [];
+                this.notifications = [];
+                this.logs = [];
+                this.metrics = {
+                    totalEvents: 0,
+                    batchCount: 0,
+                    errorCount: 0,
+                    successCount: 0,
+                    reconnectAttempts: 0
+                };
+                this.deviceInfo = null;
+                this.lastSeen = null;
+            }
+
+            initialize(config) {
+                this.config = config;
+                this._isInitialized = true;
+                this.lastSeen = new Date().toISOString();
+                this.log('SDK initialized successfully', config, 'success');
+                return Promise.resolve();
+            }
+
+            async registerDevice(deviceMetadata) {
+                this.log('Registering device with server', deviceMetadata, 'info');
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                this.deviceInfo = {
+                    ...deviceMetadata,
+                    registered_at: new Date().toISOString(),
+                    status: 'active'
+                };
+                
+                this.log('Device registered successfully', this.deviceInfo, 'success');
+                this.metrics.successCount++;
+                return Promise.resolve();
+            }
+
+            async syncNotifications() {
+                this.log('Syncing notifications from server', null, 'info');
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                this.notifications = [
+                    {
+                        id: 'notif_1',
+                        subject: 'Welcome to Notification SDK',
+                        message: 'This is a test notification to verify the SDK is working correctly.',
+                        created_at: new Date().toISOString(),
+                        active: true,
+                        stats: { viewed_count: 0, clicked_count: 0 }
+                    },
+                    {
+                        id: 'notif_2',
+                        subject: 'SDK Testing Complete',
+                        message: 'All SDK features have been tested and are working properly.',
+                        created_at: new Date().toISOString(),
+                        active: true,
+                        stats: { viewed_count: 0, clicked_count: 0 }
+                    },
+                    {
+                        id: 'notif_3',
+                        subject: 'Real-time Updates',
+                        message: 'WebSocket connection is ready for real-time notifications.',
+                        created_at: new Date().toISOString(),
+                        active: true,
+                        stats: { viewed_count: 0, clicked_count: 0 }
+                    }
+                ];
+                
+                this.log(`Synced ${this.notifications.length} notifications`, this.notifications, 'success');
+                this.metrics.successCount++;
+                return this.notifications;
+            }
+
+            async dismissNotification(notificationId) {
+                this.log(`Dismissing notification: ${notificationId}`, null, 'info');
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                const notification = this.notifications.find(n => n.id === notificationId);
+                if (notification) {
+                    notification.active = false;
+                    this.log(`Notification ${notificationId} dismissed successfully`, null, 'success');
+                    this.metrics.successCount++;
+                } else {
+                    this.log(`Notification ${notificationId} not found`, null, 'warning');
+                }
+                
+                return Promise.resolve();
+            }
+
+            trackEvent(event) {
+                const fullEvent = {
+                    ...event,
+                    event_id: `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                    timestamp: new Date().toISOString()
+                };
+                
+                this.eventQueue.push(fullEvent);
+                this.metrics.totalEvents++;
+                this.log('Event tracked successfully', fullEvent, 'success');
+                this.metrics.successCount++;
+            }
+
+            trackBatch(events) {
+                events.forEach(event => {
+                    const fullEvent = {
+                        ...event,
+                        event_id: `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                        timestamp: new Date().toISOString()
+                    };
+                    this.eventQueue.push(fullEvent);
+                });
+                
+                this.metrics.batchCount++;
+                this.metrics.totalEvents += events.length;
+                this.log(`Batch tracked: ${events.length} events`, events, 'success');
+                this.metrics.successCount++;
+            }
+
+            async flushEvents() {
+                if (this.eventQueue.length === 0) {
+                    this.log('No events to flush', null, 'warning');
+                    return;
+                }
+                
+                this.log(`Flushing ${this.eventQueue.length} events`, this.eventQueue, 'info');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const flushedCount = this.eventQueue.length;
+                this.eventQueue = [];
+                
+                this.log(`Successfully flushed ${flushedCount} events`, null, 'success');
+                this.metrics.successCount++;
+            }
+
+            async connectWebSocket() {
+                this.log('Connecting to WebSocket', null, 'info');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                this.isConnected = true;
+                this.log('WebSocket connected successfully', null, 'success');
+                this.metrics.successCount++;
+                
+                // Simulate incoming notifications
+                setTimeout(() => {
+                    this.simulateIncomingNotification();
+                }, 3000);
+            }
+
+            disconnectWebSocket() {
+                this.log('Disconnecting WebSocket', null, 'info');
+                this.isConnected = false;
+                this.log('WebSocket disconnected', null, 'warning');
+            }
+
+            onNotification(callback) {
+                this.notificationCallback = callback;
+                this.log('Notification callback registered', null, 'info');
+            }
+
+            getEventQueueSize() {
+                return this.eventQueue.length;
+            }
+
+            isInitialized() {
+                return this._isInitialized;
+            }
+
+            isWebSocketConnected() {
+                return this.isConnected;
+            }
+
+            simulateIncomingNotification() {
+                if (this.notificationCallback && this.isConnected) {
+                    const notification = {
+                        id: `notif_${Date.now()}`,
+                        subject: 'Real-time Notification',
+                        message: 'This notification was received via WebSocket in real-time!',
+                        created_at: new Date().toISOString(),
+                        active: true
+                    };
+                    
+                    this.notificationCallback(notification);
+                    this.log('Real-time notification received', notification, 'success');
+                }
+            }
+
+            log(message, data = null, level = 'info') {
+                const timestamp = new Date().toISOString();
+                const logEntry = {
+                    timestamp,
+                    level,
+                    message,
+                    data
+                };
+                
+                this.logs.push(logEntry);
+                this.updateLogs();
+                
+                // Update metrics
+                if (level === 'error') this.metrics.errorCount++;
+                if (level === 'success') this.metrics.successCount++;
+            }
+
+            updateLogs() {
+                const logsEl = document.getElementById('logs');
+                if (logsEl) {
+                    logsEl.innerHTML = this.logs.map(log => 
+                        `<div class="log-entry ${log.level}">
+                            <strong>[${log.timestamp}]</strong> ${log.message}
+                            ${log.data ? `<br><pre>${JSON.stringify(log.data, null, 2)}</pre>` : ''}
+                        </div>`
+                    ).join('');
+                    logsEl.scrollTop = logsEl.scrollHeight;
+                }
+            }
+
+            updateMetrics() {
+                // Update all metric displays
+                document.getElementById('queueSize').textContent = this.getEventQueueSize();
+                document.getElementById('totalEvents').textContent = this.metrics.totalEvents;
+                document.getElementById('batchCount').textContent = this.metrics.batchCount;
+                document.getElementById('errorCount').textContent = this.metrics.errorCount;
+                document.getElementById('successCount').textContent = this.metrics.successCount;
+                document.getElementById('reconnectAttempts').textContent = this.metrics.reconnectAttempts;
+                
+                // Update status indicators
+                document.getElementById('sdkStatus').textContent = this.isInitialized() ? '✅' : '❌';
+                document.getElementById('wsStatus').textContent = this.isWebSocketConnected() ? '✅' : '❌';
+                document.getElementById('deviceStatus').textContent = this.deviceInfo ? '✅' : '❌';
+                
+                // Update notification counts
+                const activeNotifications = this.notifications.filter(n => n.active).length;
+                document.getElementById('notificationCount').textContent = this.notifications.length;
+                document.getElementById('activeNotifications').textContent = activeNotifications;
+                
+                // Update last seen
+                document.getElementById('lastSeen').textContent = this.lastSeen ? 
+                    new Date(this.lastSeen).toLocaleTimeString() : '-';
+            }
+        }
+
+        // Global SDK instance
+        window.sdk = new NotificationSDK();
+
+        // Test functions
+        window.initializeSDK = function() {
+            const baseUrl = document.getElementById('baseUrl').value;
+            const authToken = document.getElementById('authToken').value;
+            const deviceId = document.getElementById('deviceId').value;
+            const platform = document.getElementById('platform').value;
+            const osVersion = document.getElementById('osVersion').value;
+            const appVersion = document.getElementById('appVersion').value;
+
+            if (!baseUrl || !authToken || !deviceId) {
+                showError('Please fill in all required fields');
+                return;
+            }
+
+            const config = {
+                baseUrl,
+                authToken,
+                deviceId,
+                deviceMetadata: {
+                    platform,
+                    os_version: osVersion,
+                    app_version: appVersion,
+                    country: 'US',
+                    lang: navigator.language
+                }
+            };
+
+            window.sdk.initialize(config).then(() => {
+                document.getElementById('initStatus').textContent = 'SDK initialized successfully';
+                document.getElementById('initStatus').className = 'status connected';
+                
+                // Enable buttons
+                enableButtons();
+                window.sdk.updateMetrics();
+            }).catch(error => {
+                document.getElementById('initStatus').textContent = 'SDK initialization failed';
+                document.getElementById('initStatus').className = 'status disconnected';
+                showError('SDK initialization failed: ' + error.message);
+            });
+        };
+
+        window.registerDevice = function() {
+            const deviceMetadata = {
+                platform: document.getElementById('platform').value,
+                os_version: document.getElementById('osVersion').value,
+                app_version: document.getElementById('appVersion').value,
+                country: 'US',
+                lang: navigator.language
+            };
+
+            window.sdk.registerDevice(deviceMetadata).then(() => {
+                document.getElementById('registerStatus').innerHTML = 
+                    '<div class="success-message">Device registered successfully</div>';
+                window.sdk.updateMetrics();
+            }).catch(error => {
+                document.getElementById('registerStatus').innerHTML = 
+                    '<div class="error-message">Device registration failed: ' + error.message + '</div>';
+            });
+        };
+
+        window.getDeviceInfo = function() {
+            if (window.sdk.deviceInfo) {
+                window.sdk.log('Device info retrieved', window.sdk.deviceInfo, 'info');
+                window.sdk.updateMetrics();
+            } else {
+                showError('Device not registered');
+            }
+        };
+
+        window.syncNotifications = function() {
+            window.sdk.syncNotifications().then(notifications => {
+                const listEl = document.getElementById('notificationsList');
+                if (notifications.length === 0) {
+                    listEl.innerHTML = '<p style="text-align: center; color: #6c757d;">No notifications found</p>';
+                } else {
+                    listEl.innerHTML = notifications.map(n => 
+                        `<div class="notification-item">
+                            <div class="notification-title">${n.subject}</div>
+                            <div class="notification-message">${n.message}</div>
+                            <small style="color: #6c757d;">ID: ${n.id}</small>
+                        </div>`
+                    ).join('');
+                }
+                window.sdk.updateMetrics();
+            }).catch(error => {
+                showError('Failed to sync notifications: ' + error.message);
+            });
+        };
+
+        window.dismissNotification = function() {
+            const notificationId = prompt('Enter notification ID to dismiss:');
+            if (notificationId) {
+                window.sdk.dismissNotification(notificationId).then(() => {
+                    window.sdk.syncNotifications(); // Refresh the list
+                }).catch(error => {
+                    showError('Failed to dismiss notification: ' + error.message);
+                });
+            }
+        };
+
+        window.clearNotifications = function() {
+            window.sdk.notifications = [];
+            document.getElementById('notificationsList').innerHTML = 
+                '<p style="text-align: center; color: #6c757d;">Notifications cleared</p>';
+            window.sdk.updateMetrics();
+        };
+
+        window.connectWebSocket = function() {
+            window.sdk.connectWebSocket().then(() => {
+                document.getElementById('wsStatus').textContent = 'WebSocket connected';
+                document.getElementById('wsStatus').className = 'status connected';
+                document.getElementById('wsDisconnectBtn').disabled = false;
+                document.getElementById('wsConnectBtn').disabled = true;
+                window.sdk.updateMetrics();
+            }).catch(error => {
+                showError('WebSocket connection failed: ' + error.message);
+            });
+        };
+
+        window.disconnectWebSocket = function() {
+            window.sdk.disconnectWebSocket();
+            document.getElementById('wsStatus').textContent = 'WebSocket disconnected';
+            document.getElementById('wsStatus').className = 'status disconnected';
+            document.getElementById('wsDisconnectBtn').disabled = true;
+            document.getElementById('wsConnectBtn').disabled = false;
+            window.sdk.updateMetrics();
+        };
+
+        window.trackEvent = function() {
+            const eventType = prompt('Enter event type:', 'test_event');
+            if (eventType) {
+                window.sdk.trackEvent({
+                    event_type: eventType,
+                    device_id: document.getElementById('deviceId').value,
+                    properties: {
+                        timestamp: Date.now(),
+                        user_agent: navigator.userAgent,
+                        test: true
+                    }
+                });
+                window.sdk.updateMetrics();
+            }
+        };
+
+        window.trackBatch = function() {
+            const events = [
+                {
+                    event_type: 'batch_event_1',
+                    device_id: document.getElementById('deviceId').value,
+                    properties: { batch: true, index: 1 }
+                },
+                {
+                    event_type: 'batch_event_2',
+                    device_id: document.getElementById('deviceId').value,
+                    properties: { batch: true, index: 2 }
+                },
+                {
+                    event_type: 'batch_event_3',
+                    device_id: document.getElementById('deviceId').value,
+                    properties: { batch: true, index: 3 }
+                }
+            ];
+            window.sdk.trackBatch(events);
+            window.sdk.updateMetrics();
+        };
+
+        window.flushEvents = function() {
+            window.sdk.flushEvents().then(() => {
+                window.sdk.updateMetrics();
+            }).catch(error => {
+                showError('Failed to flush events: ' + error.message);
+            });
+        };
+
+        window.clearEvents = function() {
+            window.sdk.eventQueue = [];
+            window.sdk.metrics.totalEvents = 0;
+            window.sdk.metrics.batchCount = 0;
+            window.sdk.log('Events cleared', null, 'warning');
+            window.sdk.updateMetrics();
+        };
+
+        window.checkStatus = function() {
+            const status = {
+                initialized: window.sdk.isInitialized(),
+                connected: window.sdk.isWebSocketConnected(),
+                queueSize: window.sdk.getEventQueueSize(),
+                notificationsCount: window.sdk.notifications.length,
+                deviceRegistered: !!window.sdk.deviceInfo
+            };
+            
+            window.sdk.log('SDK status check', status, 'info');
+            window.sdk.updateMetrics();
+        };
+
+        window.clearLogs = function() {
+            window.sdk.logs = [];
+            window.sdk.updateLogs();
+        };
+
+        window.resetSDK = function() {
+            window.sdk = new NotificationSDK();
+            document.getElementById('initStatus').textContent = 'SDK not initialized';
+            document.getElementById('initStatus').className = 'status disconnected';
+            document.getElementById('registerStatus').innerHTML = '';
+            document.getElementById('notificationsList').innerHTML = 
+                '<p style="text-align: center; color: #6c757d;">No notifications loaded</p>';
+            document.getElementById('wsStatus').textContent = 'WebSocket disconnected';
+            document.getElementById('wsStatus').className = 'status disconnected';
+            disableButtons();
+            window.sdk.updateMetrics();
+            window.sdk.log('SDK reset', null, 'warning');
+            
+            // Re-setup notification callback after reset
+            window.sdk.onNotification((notification) => {
+                window.sdk.log('Real-time notification received', notification, 'success');
+                alert(`📨 New notification: ${notification.subject}`);
+            });
+        };
+
+        function enableButtons() {
+            const buttons = [
+                'registerBtn', 'deviceInfoBtn', 'syncBtn', 'dismissBtn', 'clearBtn',
+                'wsConnectBtn', 'trackBtn', 'batchBtn', 'flushBtn', 'clearEventsBtn', 'statusBtn'
+            ];
+            buttons.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.disabled = false;
+            });
+        }
+
+        function disableButtons() {
+            const buttons = [
+                'registerBtn', 'deviceInfoBtn', 'syncBtn', 'dismissBtn', 'clearBtn',
+                'wsConnectBtn', 'trackBtn', 'batchBtn', 'flushBtn', 'clearEventsBtn', 'statusBtn'
+            ];
+            buttons.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.disabled = true;
+            });
+        }
+
+        function showError(message) {
+            window.sdk.log(message, null, 'error');
+        }
+
+        // Set up notification callback
+        window.sdk.onNotification((notification) => {
+            window.sdk.log('Real-time notification received', notification, 'success');
+            alert(`📨 New notification: ${notification.subject}`);
+        });
+
+        // Auto-update metrics every second
+        setInterval(() => {
+            if (window.sdk) {
+                window.sdk.updateMetrics();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

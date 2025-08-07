@@ -1,6 +1,8 @@
 import { config } from '../config';
+import { WebSocketMessage, NotificationCallback } from '../types';
+import { logger } from '../utils/logger';
 
-// WebSocket types for Node.js environment
+// React Native compatible WebSocket types
 declare global {
   interface WebSocket {
     readyState: number;
@@ -17,8 +19,6 @@ declare global {
     OPEN: number;
   };
 }
-import { WebSocketMessage, NotificationCallback } from '../types';
-import { logger } from '../utils/logger';
 
 export class WebSocketClient {
   private static instance: WebSocketClient;
