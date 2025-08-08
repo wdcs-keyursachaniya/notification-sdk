@@ -2,24 +2,6 @@ import { config } from '../config';
 import { WebSocketMessage, NotificationCallback } from '../types';
 import { logger } from '../utils/logger';
 
-// React Native compatible WebSocket types
-declare global {
-  interface WebSocket {
-    readyState: number;
-    OPEN: number;
-    onopen: (() => void) | null;
-    onmessage: ((event: { data: string }) => void) | null;
-    onclose: ((event: { code: number; reason: string }) => void) | null;
-    onerror: ((error: any) => void) | null;
-    close(code?: number, reason?: string): void;
-  }
-
-  var WebSocket: {
-    new (url: string): WebSocket;
-    OPEN: number;
-  };
-}
-
 export class WebSocketClient {
   private static instance: WebSocketClient;
   private ws: WebSocket | null = null;
