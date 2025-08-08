@@ -11,7 +11,7 @@ export interface EventQueueOptions {
 export class EventQueue {
   private static instance: EventQueue;
   private queue: TrackingEvent[] = [];
-  private flushTimer: NodeJS.Timeout | null = null;
+  private flushTimer: number | null = null;
   private _isProcessing = false;
   private retryCount = 0;
   private options: Required<EventQueueOptions>;
