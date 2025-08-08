@@ -45,7 +45,7 @@ export class Config {
 
   getHeaders(): Record<string, string> {
     return {
-      'Authorization': `Bearer ${this.getAuthToken()}`,
+      Authorization: `Bearer ${this.getAuthToken()}`,
       'X-Device-ID': this.getDeviceId(),
       'Content-Type': 'application/json',
     };

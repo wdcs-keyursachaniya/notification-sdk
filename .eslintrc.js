@@ -1,17 +1,14 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
-  extends: [
-    'eslint:recommended',
-    'prettier'
-  ],
+  extends: ['eslint:recommended', 'prettier'],
   plugins: ['@typescript-eslint', 'prettier'],
   env: {
     node: true,
-    es2022: true
+    es2022: true,
   },
   parserOptions: {
     ecmaVersion: 2022,
-    sourceType: 'module'
+    sourceType: 'module',
   },
   rules: {
     'prettier/prettier': 'error',
@@ -20,6 +17,6 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
     'no-console': 'warn',
-    'no-undef': 'off'
-  }
+    'no-undef': 'off',
+  },
 };

@@ -31,16 +31,19 @@ export class NotificationManager {
   initialize(config: SDKConfig): void {
     try {
       logger.info('Initializing Notification SDK');
-      
+
       // Initialize configuration
       sdkConfig.initialize(config);
-      
+
       this._isInitialized = true;
-      
+
       // Register device if metadata is provided (after setting initialized flag)
       if (config.deviceMetadata) {
-        this.registerDevice(config.deviceMetadata).catch((error) => {
-          logger.error('Failed to register device during initialization', error);
+        this.registerDevice(config.deviceMetadata).catch(error => {
+          logger.error(
+            'Failed to register device during initialization',
+            error
+          );
         });
       }
       logger.info('Notification SDK initialized successfully');
@@ -55,10 +58,10 @@ export class NotificationManager {
    */
   async registerDevice(deviceMetadata: DeviceMetadata): Promise<void> {
     this.ensureInitialized();
-    
+
     try {
       logger.info('Registering device with server');
-      
+
       const response = await apiClient.post('/api/users/register', {
         device_id: sdkConfig.getDeviceId(),
         ...deviceMetadata,
@@ -80,17 +83,19 @@ export class NotificationManager {
    */
   async syncNotifications(): Promise<Notification[]> {
     this.ensureInitialized();
-    
+
     try {
       logger.info('Syncing notifications from server');
-      
+
       const deviceId = sdkConfig.getDeviceId();
       const response = await apiClient.get<{ notifications: Notification[] }>(
         `/api/users/${deviceId}/notifications`
       );
 
       if (response.success && response.data) {
-        logger.info(`Synced ${response.data.notifications.length} notifications`);
+        logger.info(
+          `Synced ${response.data.notifications.length} notifications`
+        );
         return response.data.notifications;
       } else {
         throw new Error(response.error || 'Failed to sync notifications');
@@ -106,10 +111,10 @@ export class NotificationManager {
    */
   async dismissNotification(notificationId: string): Promise<void> {
     this.ensureInitialized();
-    
+
     try {
       logger.info(`Dismissing notification: ${notificationId}`);
-      
+
       const deviceId = sdkConfig.getDeviceId();
       const response = await apiClient.post(
         `/api/users/${deviceId}/dismiss/${notificationId}`
@@ -117,7 +122,7 @@ export class NotificationManager {
 
       if (response.success) {
         logger.info(`Notification ${notificationId} dismissed successfully`);
-        
+
         // Track the dismiss event
         this.trackEvent({
           event_type: 'notification_dismissed',
@@ -138,7 +143,7 @@ export class NotificationManager {
    */
   trackEvent(event: Omit<TrackingEvent, 'event_id' | 'timestamp'>): void {
     this.ensureInitialized();
-    
+
     try {
       eventQueue.addEvent(event);
     } catch (error) {
@@ -151,9 +156,9 @@ export class NotificationManager {
    */
   trackBatch(events: Omit<TrackingEvent, 'event_id' | 'timestamp'>[]): void {
     this.ensureInitialized();
-    
+
     try {
-      events.forEach((event) => {
+      events.forEach(event => {
         eventQueue.addEvent(event);
       });
       logger.debug(`Added ${events.length} events to batch`);
@@ -167,7 +172,7 @@ export class NotificationManager {
    */
   async connectWebSocket(): Promise<void> {
     this.ensureInitialized();
-    
+
     try {
       logger.info('Connecting to WebSocket');
       await webSocketClient.connect();
@@ -235,7 +240,9 @@ export class NotificationManager {
 
   private ensureInitialized(): void {
     if (!this.isInitialized()) {
-      const error = new Error('SDK not initialized. Call initialize() first.') as SDKError;
+      const error = new Error(
+        'SDK not initialized. Call initialize() first.'
+      ) as SDKError;
       error.code = 'NOT_INITIALIZED';
       error.retryable = false;
       throw error;

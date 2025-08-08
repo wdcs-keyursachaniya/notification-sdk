@@ -13,9 +13,9 @@ declare global {
     onerror: ((error: any) => void) | null;
     close(code?: number, reason?: string): void;
   }
-  
+
   var WebSocket: {
-    new(url: string): WebSocket;
+    new (url: string): WebSocket;
     OPEN: number;
   };
 }
@@ -47,14 +47,14 @@ export class WebSocketClient {
     this.isConnecting = true;
     const baseUrl = config.getBaseUrl();
     const deviceId = config.getDeviceId();
-    
+
     // Convert HTTP URL to WebSocket URL
     const wsUrl = baseUrl.replace(/^http/, 'ws') + `/ws?device_id=${deviceId}`;
-    
+
     try {
       logger.info(`Connecting to WebSocket: ${wsUrl}`);
       this.ws = new WebSocket(wsUrl);
-      
+
       this.ws.onopen = () => {
         logger.info('WebSocket connected successfully');
         this.reconnectAttempts = 0;
@@ -62,7 +62,7 @@ export class WebSocketClient {
         this.notifyConnectionCallbacks(true);
       };
 
-      this.ws.onmessage = (event) => {
+      this.ws.onmessage = event => {
         try {
           const message: WebSocketMessage = JSON.parse(event.data);
           this.handleMessage(message);
@@ -71,18 +71,17 @@ export class WebSocketClient {
         }
       };
 
-      this.ws.onclose = (event) => {
+      this.ws.onclose = event => {
         logger.warn(`WebSocket closed: ${event.code} ${event.reason}`);
         this.isConnecting = false;
         this.notifyConnectionCallbacks(false);
         this.handleReconnect();
       };
 
-      this.ws.onerror = (error) => {
+      this.ws.onerror = error => {
         logger.error('WebSocket error', error);
         this.isConnecting = false;
       };
-
     } catch (error) {
       logger.error('Failed to create WebSocket connection', error);
       this.isConnecting = false;
@@ -120,11 +119,13 @@ export class WebSocketClient {
 
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-    
-    logger.info(`Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts})`);
-    
+
+    logger.info(
+      `Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts})`
+    );
+
     setTimeout(() => {
-      this.connect().catch((error) => {
+      this.connect().catch(error => {
         logger.error('Reconnection failed', error);
       });
     }, delay);
@@ -151,7 +152,7 @@ export class WebSocketClient {
   }
 
   private notifyNotificationCallbacks(notification: any): void {
-    this.notificationCallbacks.forEach((callback) => {
+    this.notificationCallbacks.forEach(callback => {
       try {
         callback(notification);
       } catch (error) {
@@ -161,7 +162,7 @@ export class WebSocketClient {
   }
 
   private notifyConnectionCallbacks(connected: boolean): void {
-    this.connectionCallbacks.forEach((callback) => {
+    this.connectionCallbacks.forEach(callback => {
       try {
         callback(connected);
       } catch (error) {

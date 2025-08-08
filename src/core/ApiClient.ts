@@ -20,7 +20,7 @@ export class ApiClient {
   ): Promise<ApiResponse<T>> {
     const baseUrl = config.getBaseUrl();
     const headers = config.getHeaders();
-    
+
     const url = `${baseUrl}${endpoint}`;
     const requestOptions: RequestInit = {
       ...options,
@@ -33,28 +33,33 @@ export class ApiClient {
     try {
       logger.debug(`Making request to: ${url}`);
       const response = await fetch(url, requestOptions);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
-        logger.error(`API request failed: ${response.status} ${response.statusText}`, errorText);
-        
-        const error = new Error(`API request failed: ${response.status} ${response.statusText}`) as SDKError;
+        logger.error(
+          `API request failed: ${response.status} ${response.statusText}`,
+          errorText
+        );
+
+        const error = new Error(
+          `API request failed: ${response.status} ${response.statusText}`
+        ) as SDKError;
         error.code = `HTTP_${response.status}`;
         error.retryable = response.status >= 500;
         error.status = response.status;
-        
+
         throw error;
       }
 
       const data = await response.json();
       logger.debug(`API response received for: ${endpoint}`);
-      
+
       return data as ApiResponse<T>;
     } catch (error) {
       if (error instanceof Error && 'code' in error) {
         throw error;
       }
-      
+
       logger.error(`Network error for endpoint: ${endpoint}`, error);
       const sdkError = new Error('Network error') as SDKError;
       sdkError.code = 'NETWORK_ERROR';
@@ -71,11 +76,11 @@ export class ApiClient {
     const requestOptions: RequestInit = {
       method: 'POST',
     };
-    
+
     if (data) {
       requestOptions.body = JSON.stringify(data);
     }
-    
+
     return this.makeRequest<T>(endpoint, requestOptions);
   }
 
@@ -83,11 +88,11 @@ export class ApiClient {
     const requestOptions: RequestInit = {
       method: 'PUT',
     };
-    
+
     if (data) {
       requestOptions.body = JSON.stringify(data);
     }
-    
+
     return this.makeRequest<T>(endpoint, requestOptions);
   }
 
