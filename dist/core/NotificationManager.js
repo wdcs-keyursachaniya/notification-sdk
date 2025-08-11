@@ -1,9 +1,12 @@
-import { config as sdkConfig } from '../config';
-import { apiClient } from './ApiClient';
-import { webSocketClient } from './WebSocketClient';
-import { eventQueue } from '../events/EventQueue';
-import { logger } from '../utils/logger';
-export class NotificationManager {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.notificationManager = exports.NotificationManager = void 0;
+const config_1 = require("../config");
+const ApiClient_1 = require("./ApiClient");
+const WebSocketClient_1 = require("./WebSocketClient");
+const EventQueue_1 = require("../events/EventQueue");
+const logger_1 = require("../utils/logger");
+class NotificationManager {
     constructor() {
         this._isInitialized = false;
     }
@@ -18,20 +21,20 @@ export class NotificationManager {
      */
     initialize(config) {
         try {
-            logger.info('Initializing Notification SDK');
+            logger_1.logger.info('Initializing Notification SDK');
             // Initialize configuration
-            sdkConfig.initialize(config);
+            config_1.config.initialize(config);
             this._isInitialized = true;
             // Register device if metadata is provided (after setting initialized flag)
             if (config.deviceMetadata) {
                 this.registerDevice(config.deviceMetadata).catch(error => {
-                    logger.error('Failed to register device during initialization', error);
+                    logger_1.logger.error('Failed to register device during initialization', error);
                 });
             }
-            logger.info('Notification SDK initialized successfully');
+            logger_1.logger.info('Notification SDK initialized successfully');
         }
         catch (error) {
-            logger.error('Failed to initialize SDK', error);
+            logger_1.logger.error('Failed to initialize SDK', error);
             throw error;
         }
     }
@@ -41,20 +44,20 @@ export class NotificationManager {
     async registerDevice(deviceMetadata) {
         this.ensureInitialized();
         try {
-            logger.info('Registering device with server');
-            const response = await apiClient.post('/api/users/register', {
-                device_id: sdkConfig.getDeviceId(),
+            logger_1.logger.info('Registering device with server');
+            const response = await ApiClient_1.apiClient.post('/api/users/register', {
+                device_id: config_1.config.getDeviceId(),
                 ...deviceMetadata,
             });
             if (response.success) {
-                logger.info('Device registered successfully');
+                logger_1.logger.info('Device registered successfully');
             }
             else {
                 throw new Error(response.error || 'Failed to register device');
             }
         }
         catch (error) {
-            logger.error('Failed to register device', error);
+            logger_1.logger.error('Failed to register device', error);
             throw error;
         }
     }
@@ -64,11 +67,11 @@ export class NotificationManager {
     async syncNotifications() {
         this.ensureInitialized();
         try {
-            logger.info('Syncing notifications from server');
-            const deviceId = sdkConfig.getDeviceId();
-            const response = await apiClient.get(`/api/users/${deviceId}/notifications`);
+            logger_1.logger.info('Syncing notifications from server');
+            const deviceId = config_1.config.getDeviceId();
+            const response = await ApiClient_1.apiClient.get(`/api/users/${deviceId}/notifications`);
             if (response.success && response.data) {
-                logger.info(`Synced ${response.data.notifications.length} notifications`);
+                logger_1.logger.info(`Synced ${response.data.notifications.length} notifications`);
                 return response.data.notifications;
             }
             else {
@@ -76,7 +79,7 @@ export class NotificationManager {
             }
         }
         catch (error) {
-            logger.error('Failed to sync notifications', error);
+            logger_1.logger.error('Failed to sync notifications', error);
             throw error;
         }
     }
@@ -86,16 +89,16 @@ export class NotificationManager {
     async dismissNotification(notificationId) {
         this.ensureInitialized();
         try {
-            logger.info(`Dismissing notification: ${notificationId}`);
-            const deviceId = sdkConfig.getDeviceId();
-            const response = await apiClient.post(`/api/users/${deviceId}/dismiss/${notificationId}`);
+            logger_1.logger.info(`Dismissing notification: ${notificationId}`);
+            const deviceId = config_1.config.getDeviceId();
+            const response = await ApiClient_1.apiClient.post(`/api/users/${deviceId}/dismiss/${notificationId}`);
             if (response.success) {
-                logger.info(`Notification ${notificationId} dismissed successfully`);
+                logger_1.logger.info(`Notification ${notificationId} dismissed successfully`);
                 // Track the dismiss event
                 this.trackEvent({
                     event_type: 'notification_dismissed',
                     notification_id: notificationId,
-                    device_id: sdkConfig.getDeviceId(),
+                    device_id: config_1.config.getDeviceId(),
                 });
             }
             else {
@@ -103,7 +106,7 @@ export class NotificationManager {
             }
         }
         catch (error) {
-            logger.error('Failed to dismiss notification', error);
+            logger_1.logger.error('Failed to dismiss notification', error);
             throw error;
         }
     }
@@ -113,10 +116,10 @@ export class NotificationManager {
     trackEvent(event) {
         this.ensureInitialized();
         try {
-            eventQueue.addEvent(event);
+            EventQueue_1.eventQueue.addEvent(event);
         }
         catch (error) {
-            logger.error('Failed to track event', error);
+            logger_1.logger.error('Failed to track event', error);
         }
     }
     /**
@@ -126,12 +129,12 @@ export class NotificationManager {
         this.ensureInitialized();
         try {
             events.forEach(event => {
-                eventQueue.addEvent(event);
+                EventQueue_1.eventQueue.addEvent(event);
             });
-            logger.debug(`Added ${events.length} events to batch`);
+            logger_1.logger.debug(`Added ${events.length} events to batch`);
         }
         catch (error) {
-            logger.error('Failed to track batch events', error);
+            logger_1.logger.error('Failed to track batch events', error);
         }
     }
     /**
@@ -140,11 +143,11 @@ export class NotificationManager {
     async connectWebSocket() {
         this.ensureInitialized();
         try {
-            logger.info('Connecting to WebSocket');
-            await webSocketClient.connect();
+            logger_1.logger.info('Connecting to WebSocket');
+            await WebSocketClient_1.webSocketClient.connect();
         }
         catch (error) {
-            logger.error('Failed to connect to WebSocket', error);
+            logger_1.logger.error('Failed to connect to WebSocket', error);
             throw error;
         }
     }
@@ -152,49 +155,49 @@ export class NotificationManager {
      * Disconnect from WebSocket
      */
     disconnectWebSocket() {
-        webSocketClient.disconnect();
+        WebSocketClient_1.webSocketClient.disconnect();
     }
     /**
      * Register callback for notification events
      */
     onNotification(callback) {
-        webSocketClient.onNotification(callback);
+        WebSocketClient_1.webSocketClient.onNotification(callback);
     }
     /**
      * Remove notification callback
      */
     removeNotificationCallback(callback) {
-        webSocketClient.removeNotificationCallback(callback);
+        WebSocketClient_1.webSocketClient.removeNotificationCallback(callback);
     }
     /**
      * Check if WebSocket is connected
      */
     isWebSocketConnected() {
-        return webSocketClient.isConnected();
+        return WebSocketClient_1.webSocketClient.isConnected();
     }
     /**
      * Get current queue size
      */
     getEventQueueSize() {
-        return eventQueue.getQueueSize();
+        return EventQueue_1.eventQueue.getQueueSize();
     }
     /**
      * Force flush all pending events
      */
     async flushEvents() {
-        await eventQueue.forceFlush();
+        await EventQueue_1.eventQueue.forceFlush();
     }
     /**
      * Clear all pending events
      */
     clearEvents() {
-        eventQueue.clear();
+        EventQueue_1.eventQueue.clear();
     }
     /**
      * Check if SDK is initialized
      */
     isInitialized() {
-        return this._isInitialized && sdkConfig.isInitialized();
+        return this._isInitialized && config_1.config.isInitialized();
     }
     ensureInitialized() {
         if (!this.isInitialized()) {
@@ -205,5 +208,6 @@ export class NotificationManager {
         }
     }
 }
-export const notificationManager = NotificationManager.getInstance();
+exports.NotificationManager = NotificationManager;
+exports.notificationManager = NotificationManager.getInstance();
 //# sourceMappingURL=NotificationManager.js.map

@@ -1,4 +1,7 @@
-export class Config {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.config = exports.Config = void 0;
+class Config {
     constructor() {
         this.config = null;
     }
@@ -43,5 +46,6 @@ export class Config {
         return this.config !== null;
     }
 }
-export const config = Config.getInstance();
+exports.Config = Config;
+exports.config = Config.getInstance();
 //# sourceMappingURL=config.js.map

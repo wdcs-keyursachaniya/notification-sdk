@@ -1,6 +1,9 @@
-import { apiClient } from '../core/ApiClient';
-import { logger } from '../utils/logger';
-export class EventQueue {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.eventQueue = exports.EventQueue = void 0;
+const ApiClient_1 = require("../core/ApiClient");
+const logger_1 = require("../utils/logger");
+class EventQueue {
     constructor(options = {}) {
         this.queue = [];
         this.flushTimer = null;
@@ -25,7 +28,7 @@ export class EventQueue {
             timestamp: new Date().toISOString(),
         };
         this.queue.push(fullEvent);
-        logger.debug(`Event added to queue: ${fullEvent.event_type}`);
+        logger_1.logger.debug(`Event added to queue: ${fullEvent.event_type}`);
         // Start flush timer if not already running
         if (!this.flushTimer) {
             this.startFlushTimer();
@@ -57,12 +60,12 @@ export class EventQueue {
         this.clearFlushTimer();
         const eventsToSend = this.queue.splice(0, this.options.batchSize);
         try {
-            logger.info(`Flushing ${eventsToSend.length} events to server`);
-            const response = await apiClient.post('/api/track/batch', {
+            logger_1.logger.info(`Flushing ${eventsToSend.length} events to server`);
+            const response = await ApiClient_1.apiClient.post('/api/track/batch', {
                 events: eventsToSend,
             });
             if (response.success) {
-                logger.info(`Successfully sent ${eventsToSend.length} events`);
+                logger_1.logger.info(`Successfully sent ${eventsToSend.length} events`);
                 this.retryCount = 0;
             }
             else {
@@ -70,18 +73,18 @@ export class EventQueue {
             }
         }
         catch (error) {
-            logger.error('Failed to flush events', error);
+            logger_1.logger.error('Failed to flush events', error);
             // Put events back in queue for retry
             this.queue.unshift(...eventsToSend);
             this.retryCount++;
             if (this.retryCount <= this.options.maxRetries) {
-                logger.info(`Retrying in ${this.getRetryDelay()}ms (attempt ${this.retryCount})`);
+                logger_1.logger.info(`Retrying in ${this.getRetryDelay()}ms (attempt ${this.retryCount})`);
                 setTimeout(() => {
                     this.flush();
                 }, this.getRetryDelay());
             }
             else {
-                logger.error('Max retries reached, dropping events');
+                logger_1.logger.error('Max retries reached, dropping events');
                 this.retryCount = 0;
             }
         }
@@ -107,7 +110,7 @@ export class EventQueue {
         this.queue = [];
         this.clearFlushTimer();
         this.retryCount = 0;
-        logger.info('Event queue cleared');
+        logger_1.logger.info('Event queue cleared');
     }
     // Force flush all remaining events
     async forceFlush() {
@@ -116,5 +119,6 @@ export class EventQueue {
         }
     }
 }
-export const eventQueue = EventQueue.getInstance();
+exports.EventQueue = EventQueue;
+exports.eventQueue = EventQueue.getInstance();
 //# sourceMappingURL=EventQueue.js.map

@@ -1,11 +1,14 @@
-export var LogLevel;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.logger = exports.Logger = exports.LogLevel = void 0;
+var LogLevel;
 (function (LogLevel) {
     LogLevel[LogLevel["DEBUG"] = 0] = "DEBUG";
     LogLevel[LogLevel["INFO"] = 1] = "INFO";
     LogLevel[LogLevel["WARN"] = 2] = "WARN";
     LogLevel[LogLevel["ERROR"] = 3] = "ERROR";
-})(LogLevel || (LogLevel = {}));
-export class Logger {
+})(LogLevel || (exports.LogLevel = LogLevel = {}));
+class Logger {
     constructor(options = {}) {
         this.level = options.level ?? LogLevel.INFO;
         this.prefix = options.prefix ?? '[NotificationSDK]';
@@ -54,5 +57,6 @@ export class Logger {
         this.enabled = enabled;
     }
 }
-export const logger = new Logger();
+exports.Logger = Logger;
+exports.logger = new Logger();
 //# sourceMappingURL=logger.js.map
