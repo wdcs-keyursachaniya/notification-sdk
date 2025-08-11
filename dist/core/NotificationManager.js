@@ -95,7 +95,7 @@ class NotificationManager {
             if (response.success) {
                 logger_1.logger.info(`Notification ${notificationId} dismissed successfully`);
                 // Track the dismiss event
-                this.trackEvent({
+                await this.trackEvent({
                     event_type: 'notification_dismissed',
                     notification_id: notificationId,
                     device_id: config_1.config.getDeviceId(),
@@ -111,12 +111,12 @@ class NotificationManager {
         }
     }
     /**
-     * Track a single event
+     * Track a single event (queued for batch processing)
      */
-    trackEvent(event) {
+    async trackEvent(event) {
         this.ensureInitialized();
         try {
-            EventQueue_1.eventQueue.addEvent(event);
+            await EventQueue_1.eventQueue.trackEventImmediate(event);
         }
         catch (error) {
             logger_1.logger.error('Failed to track event', error);

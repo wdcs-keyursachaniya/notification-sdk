@@ -56,7 +56,6 @@ export interface User {
 }
 
 export interface TrackingEvent {
-  event_id: string;
   event_type: string;
   notification_id?: string;
   device_id: string;

@@ -34,7 +34,6 @@ export class EventQueue {
   addEvent(event: Omit<TrackingEvent, 'event_id' | 'timestamp'>): void {
     const fullEvent: TrackingEvent = {
       ...event,
-      event_id: this.generateEventId(),
       timestamp: new Date().toISOString(),
     };
 
@@ -52,8 +51,29 @@ export class EventQueue {
     }
   }
 
-  private generateEventId(): string {
-    return `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  /**
+   * Track a single event immediately without queuing
+   */
+  async trackEventImmediate(
+    event: Omit<TrackingEvent, 'event_id' | 'timestamp'>
+  ): Promise<void> {
+    const fullEvent: TrackingEvent = {
+      ...event,
+      timestamp: new Date().toISOString(),
+    };
+
+    try {
+      const response = await apiClient.post('/api/track/event', fullEvent);
+      if (response.success) {
+        logger.info('Event tracked immediately:', fullEvent.event_type);
+      } else {
+        throw new Error(response.error || 'Failed to track event immediately');
+      }
+    } catch (error) {
+      logger.error('Failed to track event immediately, adding to queue', error);
+      // Fallback to queue-based tracking
+      this.addEvent(event);
+    }
   }
 
   private startFlushTimer(): void {

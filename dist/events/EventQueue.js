@@ -24,7 +24,6 @@ class EventQueue {
     addEvent(event) {
         const fullEvent = {
             ...event,
-            event_id: this.generateEventId(),
             timestamp: new Date().toISOString(),
         };
         this.queue.push(fullEvent);
@@ -38,8 +37,28 @@ class EventQueue {
             this.flush();
         }
     }
-    generateEventId() {
-        return `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    /**
+     * Track a single event immediately without queuing
+     */
+    async trackEventImmediate(event) {
+        const fullEvent = {
+            ...event,
+            timestamp: new Date().toISOString(),
+        };
+        try {
+            const response = await ApiClient_1.apiClient.post('/api/track/event', fullEvent);
+            if (response.success) {
+                logger_1.logger.info('Event tracked immediately:', fullEvent.event_type);
+            }
+            else {
+                throw new Error(response.error || 'Failed to track event immediately');
+            }
+        }
+        catch (error) {
+            logger_1.logger.error('Failed to track event immediately, adding to queue', error);
+            // Fallback to queue-based tracking
+            this.addEvent(event);
+        }
     }
     startFlushTimer() {
         this.flushTimer = setTimeout(() => {

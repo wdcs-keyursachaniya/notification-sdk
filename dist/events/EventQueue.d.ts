@@ -14,7 +14,10 @@ export declare class EventQueue {
     private constructor();
     static getInstance(options?: EventQueueOptions): EventQueue;
     addEvent(event: Omit<TrackingEvent, 'event_id' | 'timestamp'>): void;
-    private generateEventId;
+    /**
+     * Track a single event immediately without queuing
+     */
+    trackEventImmediate(event: Omit<TrackingEvent, 'event_id' | 'timestamp'>): Promise<void>;
     private startFlushTimer;
     private clearFlushTimer;
     flush(): Promise<void>;

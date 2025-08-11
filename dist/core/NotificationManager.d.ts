@@ -21,9 +21,9 @@ export declare class NotificationManager {
      */
     dismissNotification(notificationId: string): Promise<void>;
     /**
-     * Track a single event
+     * Track a single event (queued for batch processing)
      */
-    trackEvent(event: Omit<TrackingEvent, 'event_id' | 'timestamp'>): void;
+    trackEvent(event: Omit<TrackingEvent, 'event_id' | 'timestamp'>): Promise<void>;
     /**
      * Track multiple events in batch
      */
