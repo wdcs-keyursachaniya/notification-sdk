@@ -88,15 +88,13 @@ export class NotificationManager {
       logger.info('Syncing notifications from server');
 
       const deviceId = sdkConfig.getDeviceId();
-      const response = await apiClient.get<{ notifications: Notification[] }>(
+      const response = await apiClient.get<Notification[]>(
         `/api/users/${deviceId}/notifications`
       );
 
       if (response.success && response.data) {
-        logger.info(
-          `Synced ${response.data.notifications.length} notifications`
-        );
-        return response.data.notifications;
+        logger.info(`Synced ${response.data.length} notifications`);
+        return response.data;
       } else {
         throw new Error(response.error || 'Failed to sync notifications');
       }

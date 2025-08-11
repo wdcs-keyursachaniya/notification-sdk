@@ -75,10 +75,16 @@ export class ApiClient {
   async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
     const requestOptions: RequestInit = {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     };
 
     if (data) {
       requestOptions.body = JSON.stringify(data);
+    } else {
+      // Even if no data, send empty JSON object to ensure proper Content-Type
+      requestOptions.body = '{}';
     }
 
     return this.makeRequest<T>(endpoint, requestOptions);
@@ -87,10 +93,16 @@ export class ApiClient {
   async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
     const requestOptions: RequestInit = {
       method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     };
 
     if (data) {
       requestOptions.body = JSON.stringify(data);
+    } else {
+      // Even if no data, send empty JSON object to ensure proper Content-Type
+      requestOptions.body = '{}';
     }
 
     return this.makeRequest<T>(endpoint, requestOptions);

@@ -39,7 +39,7 @@ export class EventQueue {
     };
 
     this.queue.push(fullEvent);
-    logger.debug(`Event added to queue: ${fullEvent.event_type}`);
+    logger.info(`Event added to queue: ${fullEvent.event_type}`);
 
     // Start flush timer if not already running
     if (!this.flushTimer) {

@@ -71,8 +71,8 @@ class NotificationManager {
             const deviceId = config_1.config.getDeviceId();
             const response = await ApiClient_1.apiClient.get(`/api/users/${deviceId}/notifications`);
             if (response.success && response.data) {
-                logger_1.logger.info(`Synced ${response.data.notifications.length} notifications`);
-                return response.data.notifications;
+                logger_1.logger.info(`Synced ${response.data.length} notifications`);
+                return response.data;
             }
             else {
                 throw new Error(response.error || 'Failed to sync notifications');

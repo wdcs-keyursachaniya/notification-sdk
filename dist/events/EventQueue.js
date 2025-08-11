@@ -28,7 +28,7 @@ class EventQueue {
             timestamp: new Date().toISOString(),
         };
         this.queue.push(fullEvent);
-        logger_1.logger.debug(`Event added to queue: ${fullEvent.event_type}`);
+        logger_1.logger.info(`Event added to queue: ${fullEvent.event_type}`);
         // Start flush timer if not already running
         if (!this.flushTimer) {
             this.startFlushTimer();

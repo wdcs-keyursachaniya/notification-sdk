@@ -55,18 +55,32 @@ class ApiClient {
     async post(endpoint, data) {
         const requestOptions = {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
         };
         if (data) {
             requestOptions.body = JSON.stringify(data);
+        }
+        else {
+            // Even if no data, send empty JSON object to ensure proper Content-Type
+            requestOptions.body = '{}';
         }
         return this.makeRequest(endpoint, requestOptions);
     }
     async put(endpoint, data) {
         const requestOptions = {
             method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
         };
         if (data) {
             requestOptions.body = JSON.stringify(data);
+        }
+        else {
+            // Even if no data, send empty JSON object to ensure proper Content-Type
+            requestOptions.body = '{}';
         }
         return this.makeRequest(endpoint, requestOptions);
     }
