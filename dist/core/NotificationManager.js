@@ -19,7 +19,7 @@ class NotificationManager {
     /**
      * Initialize the SDK with configuration
      */
-    initialize(config) {
+    async initialize(config) {
         try {
             logger_1.logger.info('Initializing Notification SDK');
             // Initialize configuration
@@ -27,8 +27,9 @@ class NotificationManager {
             this._isInitialized = true;
             // Register device if metadata is provided (after setting initialized flag)
             if (config.deviceMetadata) {
-                this.registerDevice(config.deviceMetadata).catch(error => {
+                await this.registerDevice(config.deviceMetadata).catch(error => {
                     logger_1.logger.error('Failed to register device during initialization', error);
+                    throw error;
                 });
             }
             logger_1.logger.info('Notification SDK initialized successfully');

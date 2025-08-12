@@ -7,7 +7,7 @@ export declare class NotificationManager {
     /**
      * Initialize the SDK with configuration
      */
-    initialize(config: SDKConfig): void;
+    initialize(config: SDKConfig): Promise<void>;
     /**
      * Register device with the server
      */
